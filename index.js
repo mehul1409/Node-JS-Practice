@@ -22,3 +22,23 @@ let result = arr.filter((item)=>{
 })
 
 console.log(result);
+console.log(result);
+
+// node js is a async language
+
+const fs = require('fs');
+const path = require('path');
+
+const dirpath = path.join(__dirname,'files');
+
+for(i=0;i<5;i++){
+    fs.writeFileSync(dirpath+`/apple${i+1}.txt`,`a simple text file number ${i+1}`);
+}
+
+fs.readdir(dirpath,(error,files)=>{
+    files.forEach(element => {
+        console.log(element);
+    });
+});
+
+
