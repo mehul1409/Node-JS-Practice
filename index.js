@@ -1,19 +1,24 @@
-const { MongoClient } = require('mongodb');
-const url = 'mongodb://localhost:27017';
-const database = 'e-comm';
+const { MongoClient } = require("mongodb");
 
-async function getdata() {
-  const client = new MongoClient(url);
+// Replace the uri string with your connection string.
+const uri = "mongodb://localhost:27017";
 
+const client = new MongoClient(uri);
+
+async function run() {
   try {
-    await client.connect();
-    const db = client.db(database);
-    const collection = db.collection('products');
-    const response = await collection.find({}).toArray();
-    console.log(response);
+    const database = client.db('e-comm');
+    const movies = database.collection('products');
+
+    // Query for a movie that has the title 'Back to the Future'
+    const query = { name: 'hoodie' };
+    const movie = await movies.findOne(query);
+
+    console.log(movie);
   } finally {
+    // Ensures that the client will close when you finish/error
     await client.close();
   }
 }
 
-getdata();
+run().catch(console.dir);
