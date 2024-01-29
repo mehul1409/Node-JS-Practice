@@ -1,24 +1,18 @@
-const { MongoClient } = require("mongodb");
+const http = require('http');
+const fs = require("fs");
 
-// Replace the uri string with your connection string.
-const uri = "mongodb://localhost:27017";
+const myserver = http.createServer((req,res)=>{
+    const log = `${Date.now()}:Recieved\n`;
+    fs.appendFile("log.txt" , log , (err,data)=>{
+        res.end('hello this is my first server'); 
+    })
+});
 
-const client = new MongoClient(uri);
+myserver.listen(8000 , (err)=>{
+    if(err){
+        console.log(err);
+    }else{
+        console.log('server started');
+    }
+});
 
-async function run() {
-  try {
-    const database = client.db('e-comm');
-    const movies = database.collection('products');
-
-    // Query for a movie that has the title 'Back to the Future'
-    const query = { name: 'hoodie' };
-    const movie = await movies.findOne(query);
-
-    console.log(movie);
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-
-run().catch(console.dir);
