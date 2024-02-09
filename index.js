@@ -1,28 +1,23 @@
-const express = require('express');
-const https = require('http');
-const path = require('path');
-const { Server } = require('socket.io');
+const express = require('express')
+const fs = require('fs');
+const status = require('express-status-monitor');
+const zlib = require('zlib');
 
 const app = express();
-const server = https.createServer(app);
-const io = new Server(server);
 
-io.on('connection',(socket)=>{
-    socket.on('user-message',message=>{
-        io.emit('message',message);
-    });
-})
+app.use(status());
 
-app.use(express.static(path.resolve("./public")));
+fs.createReadStream('./sample.txt').pipe(zlib.createGzip().pipe(fs.createWriteStream('./sample.zip')));
+
+//streaming
 
 app.get('/', (req, res) => {
-    return res.sendFile('./public/index.html')
+    const stream = fs.createReadStream('./sample.txt', "utf-8");
+    stream.on('data', (chunk) => {
+        res.write(chunk);
+    })
+    stream.on('end', () => { res.end() });
 })
 
-server.listen(8000, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log(`server is stared at port 8000`);
-    }
-})
+app.listen(8000, () => { console.log(`server starterd`) });
+
