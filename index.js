@@ -1,24 +1,28 @@
-const { MongoClient } = require("mongodb");
+const express = require('express');
+const https = require('http');
+const path = require('path');
+const { Server } = require('socket.io');
 
-// Replace the uri string with your connection string.
-const uri = "mongodb://localhost:27017";
+const app = express();
+const server = https.createServer(app);
+const io = new Server(server);
 
-const client = new MongoClient(uri);
+io.on('connection',(socket)=>{
+    socket.on('user-message',message=>{
+        io.emit('message',message);
+    });
+})
 
-async function run() {
-  try {
-    const database = client.db('e-comm');
-    const movies = database.collection('products');
+app.use(express.static(path.resolve("./public")));
 
-    // Query for a movie that has the title 'Back to the Future'
-    const query = { name: 'hoodie' };
-    const movie = await movies.findOne(query);
+app.get('/', (req, res) => {
+    return res.sendFile('./public/index.html')
+})
 
-    console.log(movie);
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-
-run().catch(console.dir);
+server.listen(8000, (err) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(`server is stared at port 8000`);
+    }
+})
